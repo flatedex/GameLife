@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <filesystem>
+#include <iostream>
 #include "menu.h"
 
 class FileWork {
@@ -18,7 +19,7 @@ public:
 	bool Input(bool (&input)[_gridSize + 1][_gridSize + 1]);
 };
 
-
-void WriteInFile(bool(&input)[_gridSize + 1][_gridSize + 1]);
+void WriteResultInFile(bool(&input)[_gridSize + 1][_gridSize + 1]);
+void WriteDataInFile(bool(&input)[_gridSize + 1][_gridSize + 1]);
 
 void ReadFromFile(bool(&inputArray)[_gridSize + 1][_gridSize + 1]);

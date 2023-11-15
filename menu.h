@@ -1,14 +1,19 @@
-#pragma once
+#ifndef MENU_H
+#define MENU_H
+
+const int _gridSize = 25;
+
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <filesystem>
+#include "tests.h"
+#include "file.h"
+#include "algorithm.h"
 
 #ifdef max
 #undef max
 #endif
-
-#include "algorithm.h"
-#include <string>
-#include <iostream>
-
-const int _gridSize = 1000;
 
 enum class Menu
 {
@@ -48,3 +53,4 @@ Menu AskRewriteFile(std::string path);
 Menu AskSaveResult(void);
 Menu AskTypeOfGame(void);
 void MainFunction(void);
+#endif // !MENU_H

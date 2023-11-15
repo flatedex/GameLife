@@ -1,4 +1,4 @@
-#include "menu.h"
+#include "algorithm.h"
 
 void clearScreen(void) {
     HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -24,11 +24,11 @@ void clearScreen(void) {
 }
 
 void printGrid(bool gridOne[_gridSize + 1][_gridSize + 1]) {
-    for (int a = 1; a < _gridSize; a++)
+    for (int i = 1; i < _gridSize; i++)
     {
-        for (int b = 1; b < _gridSize; b++)
+        for (int j = 1; j < _gridSize; j++)
         {
-            if (gridOne[a][b] == true)
+            if (gridOne[i][j] == true)
             {
                 std::cout << " O ";
             }
@@ -36,7 +36,7 @@ void printGrid(bool gridOne[_gridSize + 1][_gridSize + 1]) {
             {
                 std::cout << " . ";
             }
-            if (b == _gridSize - 1)
+            if (j == _gridSize - 1)
             {
                 std::cout << std::endl;
             }
@@ -44,7 +44,7 @@ void printGrid(bool gridOne[_gridSize + 1][_gridSize + 1]) {
     }
 }
 
-void compareGrid(bool gridOne[_gridSize + 1][_gridSize + 1], bool gridTwo[_gridSize + 1][_gridSize + 1]) {
+void compareGrid(bool(&gridOne)[_gridSize + 1][_gridSize + 1], bool(&gridTwo)[_gridSize + 1][_gridSize + 1]) {
     for (int a = 0; a < _gridSize; a++)
     {
         for (int b = 0; b < _gridSize; b++)
@@ -54,20 +54,20 @@ void compareGrid(bool gridOne[_gridSize + 1][_gridSize + 1], bool gridTwo[_gridS
     }
 }
 
-bool GameExit(bool gridOne[_gridSize + 1][_gridSize + 1], bool gridTwo[_gridSize + 1][_gridSize + 1]) {
+bool GameExit(bool (&gridOne)[_gridSize + 1][_gridSize + 1], bool (&gridTwo)[_gridSize + 1][_gridSize + 1]) {
     for (int a = 0; a < _gridSize; a++)
     {
         for (int b = 0; b < _gridSize; b++)
         {
             if (gridTwo[a][b] != gridOne[a][b]) {
-                return false;
+                return true;
             }
         }
     }
-    return true;
+    return false;
 }
 
-void determineState(bool gridOne[_gridSize + 1][_gridSize + 1]) {
+void determineState(bool (& gridOne)[_gridSize + 1][_gridSize + 1]) {
     bool gridTwo[_gridSize + 1][_gridSize + 1] = {};
     compareGrid(gridOne, gridTwo);
 

@@ -1,6 +1,3 @@
-#include <iostream>
-#include <fstream>
-#include <filesystem>
 #include "file.h"
 
 
@@ -33,6 +30,7 @@ bool FileWork::FileExist(void) {
 	checkFile.open(m_path);
 	if (checkFile.is_open()) {
 		checkFile.close();
+		std::cout << "File exist!" << std::endl;
 		return true;
 	}
 	else {
@@ -87,14 +85,40 @@ bool FileWork::FileReadOnly(void) {
 void FileWork::Output(bool input[_gridSize + 1][_gridSize + 1]) {
 	std::ofstream outputFile;
 	outputFile.open(m_path);
-	/* save output here */
+	for (int i = 1; i < _gridSize; i++)
+	{
+		for (int j = 1; j < _gridSize; j++)
+		{
+			if (input[i][j] == true)
+			{
+				outputFile << i << " " << j << std::endl;
+			}
+		}
+	}
 	outputFile.close();
 }
 
 void FileWork::SaveData(bool input[_gridSize + 1][_gridSize + 1]) {
 	std::ofstream dataFile;
 	dataFile.open(m_path);
-	/* save input data here */
+	for (int i = 1; i < _gridSize; i++)
+	{
+		for (int j = 1; j < _gridSize; j++)
+		{
+			if (input[i][j] == true)
+			{
+				dataFile << " O ";
+			}
+			else
+			{
+				dataFile << " . ";
+			}
+			if (j == _gridSize - 1)
+			{
+				dataFile << std::endl;
+			}
+		}
+	}
 	dataFile.close();
 }
 
@@ -119,8 +143,16 @@ bool FileWork::Input(bool (& input)[_gridSize + 1][_gridSize + 1]) {
 			getline(ss, xx, ' ');
 			getline(ss, yy, ' ');
 
-			int x = stoi(xx);
-			int y = stoi(yy);
+			int x, y;
+
+			try {
+				x = stoi(xx);
+				y = stoi(yy);
+			}
+			catch (std::exception&) {
+				std::cout << "Check file data!" << std::endl;
+				return false;
+			}
 
 			input[x][y] = true;
 		}
@@ -138,7 +170,56 @@ bool FileWork::Input(bool (& input)[_gridSize + 1][_gridSize + 1]) {
 	}
 }
 
-void WriteInFile(bool(&input)[_gridSize + 1][_gridSize + 1]) {
+void WriteResultInFile(bool(&input)[_gridSize + 1][_gridSize + 1]) {
+	std::string path;
+	Menu rewrite = Menu::YES;
+	std::cout << "Enter file name" << std::endl;
+	path = GetInput<std::string>();
+	FileWork inputSaveFile(path);
+	while (!inputSaveFile.SaveFileNormal()) {
+		std::cout << "Enter new file name:" << std::endl;
+		path = inputSaveFile.RewriteName();
+	}
+	std::ifstream checkFile;
+	checkFile.open(path);
+	if (checkFile.is_open()) {
+		rewrite = AskRewriteFile(path);
+		checkFile.close();
+		if (rewrite == Menu::YES) {
+			std::string newFilePath = path;
+			FileWork newInputSave(newFilePath);
+			while (newFilePath == path) {
+				std::cout << "Enter new file name:" << std::endl;
+				newFilePath = newInputSave.RewriteName();
+				while (!newInputSave.SaveFileNormal()) {
+					std::cout << "" << std::endl;
+					newFilePath = newInputSave.RewriteName();
+				}
+			}
+			FileWork file(newFilePath);
+			file.Output(input);
+		}
+		else {
+			while (inputSaveFile.FileReadOnly()) {
+				std::cout << "Enter new file name:" << std::endl;
+				path = inputSaveFile.RewriteName();
+			}
+			FileWork file(path);
+			file.Output(input);
+		}
+	}
+	else {
+		checkFile.close();
+		while (inputSaveFile.FileReadOnly()) {
+			std::cout << "Enter new file name:" << std::endl;
+			path = inputSaveFile.RewriteName();
+		}
+		FileWork file(path);
+		file.Output(input);
+	}
+}
+
+void WriteDataInFile(bool (&input)[_gridSize + 1][_gridSize + 1]) {
 	std::string path;
 	Menu rewrite = Menu::YES;
 	std::cout << "Enter file name" << std::endl;
@@ -185,7 +266,6 @@ void WriteInFile(bool(&input)[_gridSize + 1][_gridSize + 1]) {
 		FileWork file(path);
 		file.SaveData(input);
 	}
-
 }
 
 void ReadFromFile(bool(&inputArray)[_gridSize + 1][_gridSize + 1]) {

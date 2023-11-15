@@ -1,13 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <filesystem>
-#include <string>
-#include <Windows.h>
 #include "menu.h"
-#include "tests.h"
-#include "file.h"
-#include "algorithm.h"
-
 
 void Greeting() {
 	std::cout << "Zakirov Ilyas 404" << std::endl;
@@ -142,7 +133,6 @@ Menu AskTypeOfGame() {
 }
 
 void MainFunction(void) {
-	clearScreen();
 	auto wantTests = Menu::YES;
 	auto wantContinue = Menu::YES;
 	auto wantSave = Menu::YES;
@@ -150,12 +140,14 @@ void MainFunction(void) {
 	auto inputType = InputType::KEYBOARD;
 	auto gameType = Menu::YES;
 	auto continueGame = Menu::YES;
-	bool gridOne[_gridSize + 1][_gridSize + 1] = {};
 	int x, y;
 	std::string nc;
 	std::string start;
 
 	do {
+		bool gridOne[_gridSize + 1][_gridSize + 1] = {};
+		bool gridToSave[_gridSize + 1][_gridSize + 1] = {};
+
 		std::string filePath = "nothing";
 		wantTests = AskTests();
 		if (wantTests == Menu::YES) {
@@ -168,27 +160,28 @@ void MainFunction(void) {
 			std::cout << "Grid input" << std::endl;
 			ReadFromFile(gridOne);
 			std::cout << "Source grid:" << std::endl;
+			compareGrid(gridOne, gridToSave);
 			printGrid(gridOne);
 		}
 		else {
 			std::cout << "Enter number of cells: " << std::endl;
 			nc = GetInput<std::string>();
 			for (int i = 0; i < stoi(nc); i++) {
-				std::cout << stoi(nc) << "Enter the coordinates of cell " << i + 1 << " : ";
+				std::cout << "Enter the coordinates of cell " << i + 1 << " : ";
 				x = GetInput<int>();
 				y = GetInput<int>();
 				gridOne[x][y] = true;
 				printGrid(gridOne);
 			}
+			compareGrid(gridOne, gridToSave);
 		}
 		gameType = AskTypeOfGame();
 		if (gameType == Menu::YES) {
 			bool ethalon[_gridSize + 1][_gridSize + 1] = {};
-			compareGrid(gridOne, ethalon);
 			while (GameExit(gridOne, ethalon)) {
 				printGrid(gridOne);
-				determineState(gridOne);
 				compareGrid(gridOne, ethalon);
+				determineState(gridOne);
 				std::cout << "___________________________________________________" << std::endl;
 				std::cout << "Press any key to continue" << std::endl;
 				std::cin.get();
@@ -198,9 +191,9 @@ void MainFunction(void) {
 			bool ethalon[_gridSize + 1][_gridSize + 1] = {};
 			while (GameExit(gridOne, ethalon)) {
 				printGrid(gridOne);
-				determineState(gridOne);
 				compareGrid(gridOne, ethalon);
-				Sleep(50);
+				determineState(gridOne);
+				Sleep(150);
 				std::cout << "___________________________________________________" << std::endl;
 			}
 		}
@@ -208,46 +201,15 @@ void MainFunction(void) {
 		if (inputType != InputType::FILE) {
 			wantSave = AskSaveInput();
 			if (wantSave == Menu::YES) {
-				std::cout << "Saving source text" << std::endl;
-				WriteInFile(gridOne);
+				std::cout << "Saving source data about grid" << std::endl;
+				WriteDataInFile(gridToSave);
 			}
 		}
 
 		wantSave = AskSaveResult();
 		if (wantSave == Menu::YES) {
-
-			std::cout << "Enter file name:" << std::endl;
-			filePath = GetInput<std::string>();
-			FileWork outputSaveFile(filePath);
-			while (!outputSaveFile.SaveFileNormal()) {
-				std::cout << "Enter new file name" << std::endl;
-				filePath = outputSaveFile.RewriteName();
-			}
-			wantRewrite = AskRewriteFile(filePath);
-			if (wantRewrite == Menu::YES) {
-				std::string newFilePath = filePath;
-				FileWork newOutputSave(newFilePath);
-				while (newFilePath == filePath) {
-					std::cout << "Enter new file name" << std::endl;
-					newFilePath = newOutputSave.RewriteName();
-					while (!newOutputSave.SaveFileNormal()) {
-						std::cout << "Enter new file name" << std::endl;
-						newFilePath = newOutputSave.RewriteName();
-					}
-				}
-				FileWork file(newFilePath);
-				file.Output(gridOne);
-			}
-			else {
-				while (outputSaveFile.FileReadOnly()) {
-					std::cout << "Enter new file name" << std::endl;
-					filePath = outputSaveFile.RewriteName();
-				}
-				FileWork file(filePath);
-				file.Output(gridOne);
-			}
-
-
+			std::cout << "Saving result" << std::endl;
+			WriteResultInFile(gridOne);
 		}
 		wantContinue = AskRepeat();
 	} while (wantContinue == Menu::YES);

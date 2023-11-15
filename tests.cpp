@@ -1,6 +1,4 @@
-#include <iostream>
-#include <string>
-#include "algorithm.h"
+#include "tests.h"
 
 bool Test1() {
 
